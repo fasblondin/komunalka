@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Комуналка</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --bg:#f6f5f2;--card:#fff;--ink:#1c1b19;--muted:#6b6862;
+    --accent:#2f6f4f;--accent-ink:#fff;--line:#e6e3dc;--danger:#b3432b;--sub:#f0ede7;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{
+      --bg:#17181a;--card:#212226;--ink:#eceae5;--muted:#a19d94;
+      --accent:#5fae83;--accent-ink:#0c150f;--line:#2e3030;--danger:#e05c3f;--sub:#1e2022;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:16px 14px 80px;}
+  .wrap{max-width:680px;margin:0 auto;}
+  h1{font-size:1.35rem;margin-bottom:2px;}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:18px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
+  .card-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:12px;}
+  .meter{background:var(--sub);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+  .meter:last-child{margin-bottom:0;}
+  .meter-name{font-size:.9rem;font-weight:600;margin-bottom:10px;}
+  .meter-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .field label{font-size:.72rem;color:var(--muted);display:block;margin-bottom:4px;font-weight:500;}
+  .field input{width:100%;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:1rem;text-align:right;}
+  .field input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent;}
+  .field input[readonly]{background:var(--bg);color:var(--muted);cursor:default;}
+  .meter-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .meter-rate{display:flex;align-items:center;gap:8px;flex:1;}
+  .meter-rate label{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+  .meter-rate input{width:90px;padding:7px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.9rem;text-align:right;}
+  .meter-rate input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent;}
+  .meter-result{font-size:1rem;font-weight:700;color:var(--accent);white-space:nowrap;}
+  .meter-hint{font-size:.72rem;color:var(--muted);margin-bottom:8px;font-style:italic;}
+  .fixed-list{display:flex;flex-direction:column;gap:8px;}
+  .fixed-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .fixed-row label{font-size:.9rem;flex:1;}
+  .fixed-row input{width:100px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--sub);color:var(--ink);font-size:.95rem;text-align:right;}
+  .fixed-row input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent;}
+  .month-input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--sub);color:var(--ink);font-size:1rem;}
+  .month-input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent;}
+  .totals{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .t-row{display:flex;justify-content:space-between;font-size:.95rem;}
+  .t-row .lbl{color:var(--muted);}
+  .t-grand{display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;border-top:2px solid var(--line);margin-top:4px;}
+  .t-grand .lbl{font-size:1.05rem;font-weight:600;}
+  .t-grand .val{font-size:1.9rem;font-weight:700;color:var(--accent);}
+  .btn-row{display:flex;gap:10px;}
+  .btn-row>*{flex:1;}
+  button{border:none;border-radius:11px;padding:12px 14px;font-size:.95rem;cursor:pointer;font-weight:600;font-family:inherit;}
+  .btn-save{background:var(--accent);color:var(--accent-ink);}
+  .btn-save:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-clear{background:transparent;border:1px solid var(--line);color:var(--ink);}
+  .note{font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.5;}
+  .history-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  th,td{text-align:right;padding:7px 4px;border-bottom:1px solid var(--line);}
+  th:first-child,td:first-child{text-align:left;}
+  th{color:var(--muted);font-weight:500;font-size:.78rem;}
+  .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:2px 6px;}
+  .del-btn:hover{color:var(--danger);}
+  .empty{color:var(--muted);font-size:.85rem;text-align:center;padding:16px 0;}
+  .status{font-size:.75rem;color:var(--muted);margin-top:6px;min-height:16px;}
+  .status.ok{color:var(--accent);}
+  .status.err{color:var(--danger);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💡 Комуналка</h1>
+  <div class="sub">Розрахунок за місяць по лічильниках</div>
+
+  <div class="card">
+    <div class="card-title">📅 Місяць</div>
+    <input class="month-input" id="monthLabel" type="text" placeholder="Вересень 2026">
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Лічильники</div>
+
+    <div class="meter">
+      <div class="meter-name">Світло — день (кВт·год)</div>
+      <div class="meter-inputs">
+        <div class="field"><label>Попередній</label><input id="el_day_prev" type="number" step="0.001" placeholder="528"></div>
+        <div class="field"><label>Поточний</label><input id="el_day_cur" type="number" step="0.001" placeholder="680"></div>
+      </div>
+      <div class="meter-foot">
+        <div class="meter-rate"><label>Тариф грн/кВт·год</label><input id="el_day_rate" type="number" step="0.01" value="4.32"></div>
+        <div class="meter-result" id="el_day_sum">0,00 грн</div>
+      </div>
+    </div>
+
+    <div class="meter">
+      <div class="meter-name">Світло — ніч (кВт·год)</div>
+      <div class="meter-inputs">
+        <div class="field"><label>Попередній</label><input id="el_night_prev" type="number" step="0.001" placeholder="205.1"></div>
+        <div class="field"><label>Поточний</label><input id="el_night_cur" type="number" step="0.001" placeholder="288.9"></div>
+      </div>
+      <div class="meter-foot">
+        <div class="meter-rate"><label>Тариф грн/кВт·год</label><input id="el_night_rate" type="number" step="0.01" value="2.16"></div>
+        <div class="meter-result" id="el_night_sum">0,00 грн</div>
+      </div>
+    </div>
+
+    <div class="meter">
+      <div class="meter-name">Холодна вода (м³)</div>
+      <div class="meter-inputs">
+        <div class="field"><label>Попередній</label><input id="cw_prev" type="number" step="0.001" placeholder="28.63"></div>
+        <div class="field"><label>Поточний</label><input id="cw_cur" type="number" step="0.001" placeholder="37.67"></div>
+      </div>
+      <div class="meter-foot">
+        <div class="meter-rate"><label>Тариф грн/м³</label><input id="cw_rate" type="number" step="0.01" value="30.384"></div>
+        <div class="meter-result" id="cw_sum">0,00 грн</div>
+      </div>
+    </div>
+
+    <div class="meter">
+      <div class="meter-name">Гаряча вода (м³)</div>
+      <div class="meter-inputs">
+        <div class="field"><label>Попередній</label><input id="hw_prev" type="number" step="0.001" placeholder="1.656"></div>
+        <div class="field"><label>Поточний</label><input id="hw_cur" type="number" step="0.001" placeholder="5.03"></div>
+      </div>
+      <div class="meter-foot">
+        <div class="meter-rate"><label>Тариф грн/м³</label><input id="hw_rate" type="number" step="0.01" value="97.89"></div>
+        <div class="meter-result" id="hw_sum">0,00 грн</div>
+      </div>
+    </div>
+
+    <div class="meter">
+      <div class="meter-name">Водовідведення ГВ (м³)</div>
+      <div class="meter-hint">Підтягується автоматично з різниці гарячої води</div>
+      <div class="meter-inputs">
+        <div class="field"><label>Витрата (м³)</label><input id="drain_vol" type="number" step="0.001" readonly></div>
+        <div class="field"></div>
+      </div>
+      <div class="meter-foot">
+        <div class="meter-rate"><label>Тариф грн/м³</label><input id="drain_rate" type="number" step="0.01" value="14.22"></div>
+        <div class="meter-result" id="drain_sum">0,00 грн</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧾 Фіксовані платежі</div>
+    <div class="fixed-list">
+      <div class="fixed-row"><label>Абонплата — холодна вода</label><input id="f_ab_cw" type="number" step="0.01" value="51.6"></div>
+      <div class="fixed-row"><label>Абонплата — тепло</label><input id="f_ab_heat" type="number" step="0.01" value="43.39"></div>
+      <div class="fixed-row"><label>Абонплата — гаряча вода</label><input id="f_ab_hw" type="number" step="0.01" value="45.5"></div>
+      <div class="fixed-row"><label>Інтернет</label><input id="f_internet" type="number" step="0.01" value="339"></div>
+      <div class="fixed-row"><label>Утримання прибудинкової тер.</label><input id="f_yard" type="number" step="0.01" value="725.22"></div>
+      <div class="fixed-row"><label>Охорона будинку</label><input id="f_guard" type="number" step="0.01" value="230"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💰 Підсумок</div>
+    <div class="totals">
+      <div class="t-row"><span class="lbl">Лічильники</span><span id="sumMeters">0,00 грн</span></div>
+      <div class="t-row"><span class="lbl">Фіксовані платежі</span><span id="sumFixed">0,00 грн</span></div>
+      <div class="t-grand"><span class="lbl">Всього</span><span class="val" id="grandTotal">0,00 грн</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-save" id="saveBtn">💾 Зберегти місяць</button>
+      <button class="btn-clear" id="clearBtn">Очистити</button>
+    </div>
+    <div class="status" id="saveStatus"></div>
+    <div class="note">Після збереження поточні показники стануть «попередніми» для наступного місяця.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Історія</div>
+    <div class="history-wrap">
+      <table>
+        <thead><tr><th>Місяць</th><th>Лічильники</th><th>Фіксовані</th><th>Всього</th><th></th></tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+      <div class="empty" id="emptyHistory">Збережи перший місяць — з'явиться тут</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Telegram Web App init
+if (window.Telegram && window.Telegram.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+  // підхоплюємо тему Telegram
+  const tg = Telegram.WebApp;
+  if (tg.colorScheme === 'dark') {
+    document.documentElement.setAttribute('data-theme','dark');
+  }
+}
+
+const STORAGE_KEY = 'komunalka_v3';
+const fmt = n => n.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2})+' грн';
+const v = id => parseFloat(document.getElementById(id).value)||0;
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch{ return {}; }
+}
+function save(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch{}
+}
+
+function recalc() {
+  const elDay   = Math.max(0, v('el_day_cur')   - v('el_day_prev'))   * v('el_day_rate');
+  const elNight = Math.max(0, v('el_night_cur') - v('el_night_prev')) * v('el_night_rate');
+  const cw      = Math.max(0, v('cw_cur')       - v('cw_prev'))       * v('cw_rate');
+  const hwVol   = Math.max(0, v('hw_cur')       - v('hw_prev'));
+  const hw      = hwVol * v('hw_rate');
+  document.getElementById('drain_vol').value = hwVol ? hwVol.toFixed(3) : '';
+  const drain   = hwVol * v('drain_rate');
+
+  document.getElementById('el_day_sum').textContent   = fmt(elDay);
+  document.getElementById('el_night_sum').textContent = fmt(elNight);
+  document.getElementById('cw_sum').textContent       = fmt(cw);
+  document.getElementById('hw_sum').textContent       = fmt(hw);
+  document.getElementById('drain_sum').textContent    = fmt(drain);
+
+  const meters = elDay + elNight + cw + hw + drain;
+  const fixed  = v('f_ab_cw')+v('f_ab_heat')+v('f_ab_hw')+v('f_internet')+v('f_yard')+v('f_guard');
+  document.getElementById('sumMeters').textContent  = fmt(meters);
+  document.getElementById('sumFixed').textContent   = fmt(fixed);
+  document.getElementById('grandTotal').textContent = fmt(meters+fixed);
+  return {meters, fixed, total: meters+fixed};
+}
+
+function renderHistory() {
+  const data  = load();
+  const hist  = (data.history||[]).slice().reverse();
+  const body  = document.getElementById('historyBody');
+  const empty = document.getElementById('emptyHistory');
+  body.innerHTML = '';
+  if (!hist.length) { empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  hist.forEach((rec, ri) => {
+    const realIdx = (data.history||[]).length - 1 - ri;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${rec.month||'—'}</td><td>${fmt(rec.meters)}</td><td>${fmt(rec.fixed)}</td>
+      <td><strong>${fmt(rec.total)}</strong></td>
+      <td><button class="del-btn" data-i="${realIdx}">✕</button></td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', () => {
+    if (!confirm('Видалити запис?')) return;
+    const d = load();
+    d.history.splice(+b.dataset.i, 1);
+    save(d);
+    renderHistory();
+  }));
+}
+
+function init() {
+  const data = load();
+  // підтягуємо попередні показники з останнього збереженого місяця
+  if (data.last) {
+    const L = data.last;
+    if (L.el_day_cur)   document.getElementById('el_day_prev').value   = L.el_day_cur;
+    if (L.el_night_cur) document.getElementById('el_night_prev').value = L.el_night_cur;
+    if (L.cw_cur)       document.getElementById('cw_prev').value       = L.cw_cur;
+    if (L.hw_cur)       document.getElementById('hw_prev').value       = L.hw_cur;
+  }
+  recalc();
+  renderHistory();
+}
+
+document.querySelectorAll('input:not([readonly])').forEach(i => i.addEventListener('input', recalc));
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const t = recalc();
+  const data = load();
+  if (!data.history) data.history = [];
+  const monthName = document.getElementById('monthLabel').value || `Місяць ${data.history.length+1}`;
+  const readings = {
+    el_day_cur:   v('el_day_cur'),
+    el_night_cur: v('el_night_cur'),
+    cw_cur:       v('cw_cur'),
+    hw_cur:       v('hw_cur'),
+  };
+  data.history.push({month: monthName, meters: t.meters, fixed: t.fixed, total: t.total, ts: Date.now()});
+  data.last = readings;
+  save(data);
+
+  // поточні → попередні
+  document.getElementById('el_day_prev').value   = readings.el_day_cur   || '';
+  document.getElementById('el_night_prev').value = readings.el_night_cur || '';
+  document.getElementById('cw_prev').value       = readings.cw_cur       || '';
+  document.getElementById('hw_prev').value       = readings.hw_cur       || '';
+  document.getElementById('el_day_cur').value   = '';
+  document.getElementById('el_night_cur').value = '';
+  document.getElementById('cw_cur').value       = '';
+  document.getElementById('hw_cur').value       = '';
+  document.getElementById('monthLabel').value   = '';
+
+  recalc();
+  renderHistory();
+
+  const st = document.getElementById('saveStatus');
+  st.className = 'status ok';
+  st.textContent = '✓ Збережено';
+  setTimeout(()=>st.textContent='', 2000);
+
+  if (window.Telegram && window.Telegram.WebApp) {
+    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+  }
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  ['el_day_prev','el_day_cur','el_night_prev','el_night_cur','cw_prev','cw_cur','hw_prev','hw_cur'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  recalc();
+});
+
+init();
+</script>
+</body>
+</html>
