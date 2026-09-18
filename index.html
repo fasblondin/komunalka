@@ -127,11 +127,11 @@
     <div class="meter">
       <div class="meter-name">Світло — день (кВт·год)</div>
       <div class="meter-inputs">
-        <div class="field"><label>Попередній</label><input id="el_day_prev" type="number" step="0.001" inputmode="decimal" placeholder="528"></div>
-        <div class="field"><label>Поточний</label><input id="el_day_cur" type="number" step="0.001" inputmode="decimal" placeholder="680"></div>
+        <div class="field"><label>Попередній</label><input id="el_day_prev" type="text" inputmode="decimal" placeholder="528"></div>
+        <div class="field"><label>Поточний</label><input id="el_day_cur" type="text" inputmode="decimal" placeholder="680"></div>
       </div>
       <div class="meter-foot">
-        <div class="meter-rate"><label>Тариф грн/кВт·год</label><input id="el_day_rate" type="number" step="0.01" inputmode="decimal" value="4.32"></div>
+        <div class="meter-rate"><label>Тариф грн/кВт·год</label><input id="el_day_rate" type="text" inputmode="decimal" value="4.32"></div>
         <div class="meter-result" id="el_day_sum">0,00 грн</div>
       </div>
     </div>
@@ -140,11 +140,11 @@
     <div class="meter">
       <div class="meter-name">Світло — ніч (кВт·год)</div>
       <div class="meter-inputs">
-        <div class="field"><label>Попередній</label><input id="el_night_prev" type="number" step="0.001" inputmode="decimal" placeholder="205.1"></div>
-        <div class="field"><label>Поточний</label><input id="el_night_cur" type="number" step="0.001" inputmode="decimal" placeholder="288.9"></div>
+        <div class="field"><label>Попередній</label><input id="el_night_prev" type="text" inputmode="decimal" placeholder="205.1"></div>
+        <div class="field"><label>Поточний</label><input id="el_night_cur" type="text" inputmode="decimal" placeholder="288.9"></div>
       </div>
       <div class="meter-foot">
-        <div class="meter-rate"><label>Тариф грн/кВт·год</label><input id="el_night_rate" type="number" step="0.01" inputmode="decimal" value="2.16"></div>
+        <div class="meter-rate"><label>Тариф грн/кВт·год</label><input id="el_night_rate" type="text" inputmode="decimal" value="2.16"></div>
         <div class="meter-result" id="el_night_sum">0,00 грн</div>
       </div>
     </div>
@@ -153,11 +153,11 @@
     <div class="meter">
       <div class="meter-name">Холодна вода (м³)</div>
       <div class="meter-inputs">
-        <div class="field"><label>Попередній</label><input id="cw_prev" type="number" step="0.001" inputmode="decimal" placeholder="28.63"></div>
-        <div class="field"><label>Поточний</label><input id="cw_cur" type="number" step="0.001" inputmode="decimal" placeholder="37.67"></div>
+        <div class="field"><label>Попередній</label><input id="cw_prev" type="text" inputmode="decimal" placeholder="28.63"></div>
+        <div class="field"><label>Поточний</label><input id="cw_cur" type="text" inputmode="decimal" placeholder="37.67"></div>
       </div>
       <div class="meter-foot">
-        <div class="meter-rate"><label>Тариф грн/м³</label><input id="cw_rate" type="number" step="0.01" inputmode="decimal" value="30.384"></div>
+        <div class="meter-rate"><label>Тариф грн/м³</label><input id="cw_rate" type="text" inputmode="decimal" value="30.384"></div>
         <div class="meter-result" id="cw_sum">0,00 грн</div>
       </div>
     </div>
@@ -166,11 +166,11 @@
     <div class="meter">
       <div class="meter-name">Гаряча вода (м³)</div>
       <div class="meter-inputs">
-        <div class="field"><label>Попередній</label><input id="hw_prev" type="number" step="0.001" inputmode="decimal" placeholder="1.656"></div>
-        <div class="field"><label>Поточний</label><input id="hw_cur" type="number" step="0.001" inputmode="decimal" placeholder="5.03"></div>
+        <div class="field"><label>Попередній</label><input id="hw_prev" type="text" inputmode="decimal" placeholder="1.656"></div>
+        <div class="field"><label>Поточний</label><input id="hw_cur" type="text" inputmode="decimal" placeholder="5.03"></div>
       </div>
       <div class="meter-foot">
-        <div class="meter-rate"><label>Тариф грн/м³</label><input id="hw_rate" type="number" step="0.01" inputmode="decimal" value="97.89"></div>
+        <div class="meter-rate"><label>Тариф грн/м³</label><input id="hw_rate" type="text" inputmode="decimal" value="97.89"></div>
         <div class="meter-result" id="hw_sum">0,00 грн</div>
       </div>
     </div>
@@ -184,7 +184,7 @@
         <div class="field"></div>
       </div>
       <div class="meter-foot">
-        <div class="meter-rate"><label>Тариф грн/м³</label><input id="drain_rate" type="number" step="0.01" inputmode="decimal" value="14.22"></div>
+        <div class="meter-rate"><label>Тариф грн/м³</label><input id="drain_rate" type="text" inputmode="decimal" value="14.22"></div>
         <div class="meter-result" id="drain_sum">0,00 грн</div>
       </div>
     </div>
@@ -201,11 +201,11 @@
       <div id="heat_fields">
         <div class="meter-hint">Вмикай тільки в опалювальний сезон</div>
         <div class="meter-inputs">
-          <div class="field"><label>Попередній</label><input id="heat_prev" type="number" step="0.0001" inputmode="decimal" placeholder="0.0000" disabled></div>
-          <div class="field"><label>Поточний</label><input id="heat_cur" type="number" step="0.0001" inputmode="decimal" placeholder="0.0000" disabled></div>
+          <div class="field"><label>Попередній</label><input id="heat_prev" type="text" inputmode="decimal" placeholder="0.0000" disabled></div>
+          <div class="field"><label>Поточний</label><input id="heat_cur" type="text" inputmode="decimal" placeholder="0.0000" disabled></div>
         </div>
         <div class="meter-foot">
-          <div class="meter-rate"><label>Тариф грн/Гкал</label><input id="heat_rate" type="number" step="0.01" inputmode="decimal" value="1654.41" disabled></div>
+          <div class="meter-rate"><label>Тариф грн/Гкал</label><input id="heat_rate" type="text" inputmode="decimal" value="1654.41" disabled></div>
           <div class="meter-result disabled" id="heat_sum">вимкнено</div>
         </div>
       </div>
@@ -216,12 +216,12 @@
   <div class="card">
     <div class="card-title">🧾 Фіксовані платежі</div>
     <div class="fixed-list">
-      <div class="fixed-row"><label>Абонплата — холодна вода</label><input id="f_ab_cw" type="number" step="0.01" inputmode="decimal" value="51.6"></div>
-      <div class="fixed-row"><label>Абонплата — тепло</label><input id="f_ab_heat" type="number" step="0.01" inputmode="decimal" value="43.39"></div>
-      <div class="fixed-row"><label>Абонплата — гаряча вода</label><input id="f_ab_hw" type="number" step="0.01" inputmode="decimal" value="45.5"></div>
-      <div class="fixed-row"><label>Інтернет</label><input id="f_internet" type="number" step="0.01" inputmode="decimal" value="339"></div>
-      <div class="fixed-row"><label>Утримання прибудинкової тер.</label><input id="f_yard" type="number" step="0.01" inputmode="decimal" value="725.22"></div>
-      <div class="fixed-row"><label>Охорона будинку</label><input id="f_guard" type="number" step="0.01" inputmode="decimal" value="230"></div>
+      <div class="fixed-row"><label>Абонплата — холодна вода</label><input id="f_ab_cw" type="text" inputmode="decimal" value="51.6"></div>
+      <div class="fixed-row"><label>Абонплата — тепло</label><input id="f_ab_heat" type="text" inputmode="decimal" value="43.39"></div>
+      <div class="fixed-row"><label>Абонплата — гаряча вода</label><input id="f_ab_hw" type="text" inputmode="decimal" value="45.5"></div>
+      <div class="fixed-row"><label>Інтернет</label><input id="f_internet" type="text" inputmode="decimal" value="339"></div>
+      <div class="fixed-row"><label>Утримання прибудинкової тер.</label><input id="f_yard" type="text" inputmode="decimal" value="725.22"></div>
+      <div class="fixed-row"><label>Охорона будинку</label><input id="f_guard" type="text" inputmode="decimal" value="230"></div>
     </div>
   </div>
 
@@ -268,7 +268,7 @@ const STORAGE_KEY = 'komunalka_v3';
 const MONTHS_UA = ['Січень','Лютий','Березень','Квітень','Травень','Червень',
                    'Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
 const fmt = n => n.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2})+' грн';
-const v = id => parseFloat(document.getElementById(id).value)||0;
+const v = id => parseFloat((document.getElementById(id).value||'').replace(',','.'))||0;
 
 let selectedYear = null, selectedMonth = null;
 
