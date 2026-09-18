@@ -28,9 +28,12 @@
   .sub{color:var(--muted);font-size:.85rem;margin-bottom:18px;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
   .card-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:12px;}
-  .picker-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
-  .picker-label{font-size:.72rem;color:var(--muted);font-weight:500;display:block;margin-bottom:6px;}
-  .month-btn,.year-btn{padding:8px 12px;border-radius:9px;border:1px solid var(--line);background:var(--sub);color:var(--ink);font-size:.9rem;cursor:pointer;font-family:inherit;}
+  .picker-wrap{display:flex;align-items:flex-start;gap:10px;}
+  .picker-years{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+  .picker-months{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;flex:1;}
+  .picker-label{font-size:.68rem;color:var(--muted);font-weight:500;display:block;margin-bottom:5px;}
+  .month-btn{padding:5px 2px;border-radius:7px;border:1px solid var(--line);background:var(--sub);color:var(--ink);font-size:.78rem;cursor:pointer;font-family:inherit;text-align:center;width:100%;}
+  .year-btn{padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:var(--sub);color:var(--ink);font-size:.82rem;cursor:pointer;font-family:inherit;white-space:nowrap;}
   .month-btn.active,.year-btn.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600;}
   .month-status{font-size:.8rem;padding:8px 12px;border-radius:9px;display:none;margin-top:4px;}
   .month-status.exists{background:var(--warn-bg);color:var(--warn);display:block;}
@@ -103,10 +106,16 @@
   <!-- MONTH PICKER -->
   <div class="card">
     <div class="card-title">📅 Місяць</div>
-    <span class="picker-label">Рік</span>
-    <div class="picker-row" id="yearPicker"></div>
-    <span class="picker-label">Місяць</span>
-    <div class="picker-row" id="monthPicker"></div>
+    <div class="picker-wrap">
+      <div>
+        <div class="picker-label">Рік</div>
+        <div class="picker-years" id="yearPicker"></div>
+      </div>
+      <div style="flex:1">
+        <div class="picker-label">Місяць</div>
+        <div class="picker-months" id="monthPicker"></div>
+      </div>
+    </div>
     <div class="month-status" id="monthStatus"></div>
   </div>
 
@@ -286,7 +295,7 @@ function buildPickers(){
   const curY = now.getFullYear();
   const yearDiv = document.getElementById('yearPicker');
   const monthDiv = document.getElementById('monthPicker');
-  for(let y=curY-1;y<=curY+1;y++){
+  for(let y=curY;y<=curY+1;y++){
     const btn=document.createElement('button');
     btn.className='year-btn'; btn.textContent=y; btn.dataset.year=y;
     btn.addEventListener('click',()=>selectYear(y));
