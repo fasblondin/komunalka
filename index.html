@@ -96,6 +96,20 @@
   .del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:2px 6px;}
   .del-btn:hover{color:var(--danger);}
   .empty{color:var(--muted);font-size:.85rem;text-align:center;padding:16px 0;}
+  .hist-main{cursor:pointer;}
+  .hist-main:hover td{background:var(--sub);}
+  .hist-main td:first-child::before{content:"▶ ";font-size:.6rem;color:var(--muted);}
+  .hist-main.open td:first-child::before{content:"▼ ";}
+  .hist-detail{display:none;background:var(--sub);}
+  .hist-detail.open{display:table-row;}
+  .hist-detail td{padding:10px 8px 12px;text-align:left;border-bottom:2px solid var(--line);}
+  .detail-row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px solid var(--line);font-size:.82rem;}
+  .detail-row:last-child{border-bottom:none;}
+  .detail-lbl{color:var(--muted);}
+  .detail-val{font-weight:500;}
+  .detail-section{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:8px 0 4px;font-weight:600;}
+  .detail-total{display:flex;justify-content:space-between;font-weight:700;font-size:.95rem;margin-top:8px;padding-top:8px;border-top:2px solid var(--line);}
+  .detail-total span:last-child{color:var(--accent);}
 </style>
 </head>
 <body>
@@ -430,6 +444,10 @@ function buildRecord(t){
     hw_prev:v('hw_prev'), hw_cur:v('hw_cur'),
     heat_enabled:heatOn, heat_prev:heatOn?v('heat_prev'):null,
     heat_cur:heatOn?v('heat_cur'):null, heat_rate:v('heat_rate'),
+    el_day_rate:v('el_day_rate'), el_night_rate:v('el_night_rate'),
+    cw_rate:v('cw_rate'), hw_rate:v('hw_rate'), drain_rate:v('drain_rate'),
+    f_ab_cw:v('f_ab_cw'), f_ab_heat:v('f_ab_heat'), f_ab_hw:v('f_ab_hw'),
+    f_internet:v('f_internet'), f_yard:v('f_yard'), f_guard:v('f_guard'),
     meters:t.meters, heat:t.heat, fixed:t.fixed, total:t.total, ts:Date.now()
   };
 }
@@ -460,6 +478,32 @@ function doSave(isEdit){
 }
 
 // ---- HISTORY ----
+function detailHTML(rec){
+  const diff=(a,b)=>a&&b?(+b-+a).toFixed(3):'—';
+  const fmtN=n=>n?fmt(+n):'—';
+  const rows=(label,prev,cur,rate,sum)=>`
+    <div class="detail-row"><span class="detail-lbl">${label}</span><span class="detail-val">${diff(prev,cur)} од. × ${rate} = ${fmtN(sum)}</span></div>`;
+  let html=`<div class="detail-section">⚡ Лічильники</div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Світло день</span><span class="detail-val">${diff(rec.el_day_prev,rec.el_day_cur)} кВт·год × ${rec.el_day_rate||4.32} = ${fmt(Math.max(0,rec.el_day_cur-rec.el_day_prev)*( rec.el_day_rate||4.32))}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Світло ніч</span><span class="detail-val">${diff(rec.el_night_prev,rec.el_night_cur)} кВт·год × ${rec.el_night_rate||2.16} = ${fmt(Math.max(0,rec.el_night_cur-rec.el_night_prev)*(rec.el_night_rate||2.16))}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Холодна вода</span><span class="detail-val">${diff(rec.cw_prev,rec.cw_cur)} м³ × ${rec.cw_rate||30.384} = ${fmt(Math.max(0,rec.cw_cur-rec.cw_prev)*(rec.cw_rate||30.384))}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Гаряча вода</span><span class="detail-val">${diff(rec.hw_prev,rec.hw_cur)} м³ × ${rec.hw_rate||97.89} = ${fmt(Math.max(0,rec.hw_cur-rec.hw_prev)*(rec.hw_rate||97.89))}</span></div>`;
+  const hwVol=Math.max(0,(rec.hw_cur||0)-(rec.hw_prev||0));
+  html+=`<div class="detail-row"><span class="detail-lbl">Водовідведення ГВ</span><span class="detail-val">${hwVol.toFixed(3)} м³ × ${rec.drain_rate||14.22} = ${fmt(hwVol*(rec.drain_rate||14.22))}</span></div>`;
+  if(rec.heat_enabled){
+    html+=`<div class="detail-row"><span class="detail-lbl">Опалення</span><span class="detail-val">${diff(rec.heat_prev,rec.heat_cur)} Гкал × ${rec.heat_rate||1654.41} = ${fmt(Math.max(0,rec.heat_cur-rec.heat_prev)*(rec.heat_rate||1654.41))}</span></div>`;
+  }
+  html+=`<div class="detail-section">🧾 Фіксовані</div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Абонплата хол. вода</span><span class="detail-val">${fmtN(rec.f_ab_cw||51.6)}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Абонплата тепло</span><span class="detail-val">${fmtN(rec.f_ab_heat||43.39)}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Абонплата гар. вода</span><span class="detail-val">${fmtN(rec.f_ab_hw||45.5)}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Інтернет</span><span class="detail-val">${fmtN(rec.f_internet||339)}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Утримання тер.</span><span class="detail-val">${fmtN(rec.f_yard||725.22)}</span></div>`;
+  html+=`<div class="detail-row"><span class="detail-lbl">Охорона</span><span class="detail-val">${fmtN(rec.f_guard||230)}</span></div>`;
+  html+=`<div class="detail-total"><span>Всього</span><span>${fmt(rec.total)}</span></div>`;
+  return html;
+}
+
 function renderHistory(){
   const data=loadData();
   const months=data.months||{};
@@ -471,11 +515,24 @@ function renderHistory(){
   empty.style.display='none';
   keys.forEach(key=>{
     const rec=months[key];
+    // main row
     const tr=document.createElement('tr');
+    tr.className='hist-main';
     tr.innerHTML=`<td>${rec.month||key}</td><td>${fmt(rec.meters+(rec.heat||0))}</td><td>${fmt(rec.fixed)}</td>
       <td><strong>${fmt(rec.total)}</strong></td>
       <td><button class="del-btn" data-key="${key}">✕</button></td>`;
     body.appendChild(tr);
+    // detail row
+    const td=document.createElement('tr');
+    td.className='hist-detail';
+    td.innerHTML=`<td colspan="5"><div>${detailHTML(rec)}</div></td>`;
+    body.appendChild(td);
+    // toggle
+    tr.addEventListener('click',(e)=>{
+      if(e.target.classList.contains('del-btn')) return;
+      tr.classList.toggle('open');
+      td.classList.toggle('open');
+    });
   });
   body.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',()=>{
     if(!confirm('Видалити запис?')) return;
